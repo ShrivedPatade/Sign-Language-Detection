@@ -1,16 +1,9 @@
 import os
 import cv2
+import time
 
 # --- Configuration ---
-# Directory to save the dataset
-DATA_DIR = './data'
-
-# Number of classes (e.g., 26 for A-Z)
-NUM_CLASSES = 3
-
-# Number of images to collect per class
-SAMPLES_PER_CLASS = 100
-# ---------------------
+from config import DATA_DIR, NUM_CLASSES, SAMPLES_PER_CLASS
 
 def collect_images():
     """
@@ -29,6 +22,13 @@ def collect_images():
     # Loop through each class
     for j in range(NUM_CLASSES):
         class_dir = os.path.join(DATA_DIR, str(j))
+        
+        print(f"Starting in 3...")
+        for i in range(3, 0, -1):
+            ret, frame = cap.read()
+            cv2.putText(frame, str(i), (250, 250), cv2.FONT_HERSHEY_SIMPLEX, 5, (0, 0, 255), 10)
+            cv2.imshow('frame', frame)
+            cv2.waitKey(1000)
         
         # Create a directory for the current class
         if not os.path.exists(class_dir):
