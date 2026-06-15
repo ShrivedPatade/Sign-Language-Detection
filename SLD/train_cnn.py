@@ -2,11 +2,11 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from torchvision import datasets, transforms, models
+from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 from config import PROCESSED_DATA_DIR, IMG_SIZE, BATCH_SIZE, EPOCHS, MODEL_PATH, DEVICE, LEARNING_RATE
 
-# 1. Define the CNN Architecture
+# Define the CNN Architecture (Same as before)
 class SignLanguageCNN(nn.Module):
     def __init__(self, num_classes):
         super(SignLanguageCNN, self).__init__()
@@ -35,7 +35,7 @@ class SignLanguageCNN(nn.Module):
         return x
 
 def train_model():
-    # 2. Data Augmentation and Loading
+    # 1. Data Preparation
     transform = transforms.Compose([
         transforms.Resize((IMG_SIZE, IMG_SIZE)),
         transforms.RandomHorizontalFlip(),
@@ -58,7 +58,8 @@ def train_model():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
-    # 3. Training Loop
+    # --- Checkpointing Setup ---
+    best_val_acc = 0.0 
     history = {'train_loss': [], 'val_acc': []}
     
     print(f"Starting training on {DEVICE}...")
@@ -75,7 +76,7 @@ def train_model():
             optimizer.step()
             running_loss += loss.item()
 
-        # Validation
+        # Validation phase
         model.eval()
         correct = 0
         total = 0
@@ -88,13 +89,20 @@ def train_model():
                 correct += (predicted == labels).sum().item()
 
         val_acc = 100 * correct / total
-        history['train_loss'].append(running_loss / len(train_loader))
+        avg_loss = running_loss / len(train_loader)
+        
+        history['train_loss'].append(avg_loss)
         history['val_acc'].append(val_acc)
-        print(f"Epoch [{epoch+1}/{EPOCHS}], Loss: {running_loss/len(train_loader):.4f}, Val Acc: {val_acc:.2f}%")
+        
+        print(f"Epoch [{epoch+1}/{EPOCHS}], Loss: {avg_loss:.4f}, Val Acc: {val_acc:.2f}%")
 
-    # 4. Save Model
-    torch.save(model.state_state_dict(), MODEL_PATH)
-    print(f"Model saved to {MODEL_PATH}")
+        # --- Save Best Model Logic ---
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
+            torch.save(model.state_dict(), MODEL_PATH) # Fixed typo here
+            print(f"--> New best model saved with accuracy: {val_acc:.2f}%")
+
+    print(f"Training complete. Best Validation Accuracy: {best_val_acc:.2f}%")
 
 if __name__ == "__main__":
     train_model()

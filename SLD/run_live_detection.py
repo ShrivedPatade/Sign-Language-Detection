@@ -5,7 +5,6 @@ import mediapipe as mp
 from torchvision import transforms
 from collections import deque, Counter
 from config import MODEL_PATH, IMG_SIZE, DEVICE, LABELS
-# Import the model class from your training script
 from train_cnn import SignLanguageCNN 
 
 def run_detection():

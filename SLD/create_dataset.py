@@ -4,10 +4,7 @@ import mediapipe as mp
 import numpy as np
 
 # --- Configuration ---
-RAW_DATA_DIR = './data'
-PROCESSED_DATA_DIR = './processed_data'
-IMG_SIZE = 64
-PADDING_FACTOR = 0.15 # Add 15% padding around the hand
+from config import DATA_DIR as RAW_DATA_DIR, PROCESSED_DATA_DIR, IMG_SIZE, PADDING_FACTOR
 # ---------------------
 
 def preprocess_images():
@@ -22,7 +19,7 @@ def preprocess_images():
     if not os.path.exists(PROCESSED_DATA_DIR):
         os.makedirs(PROCESSED_DATA_DIR)
 
-    for dir_name in sorted(os.listdir(RAW_DATA_DIR), key=int):
+    for dir_name in sorted(os.listdir(RAW_DATA_DIR), key=str):
         raw_class_dir = os.path.join(RAW_DATA_DIR, dir_name)
         processed_class_dir = os.path.join(PROCESSED_DATA_DIR, dir_name)
 
